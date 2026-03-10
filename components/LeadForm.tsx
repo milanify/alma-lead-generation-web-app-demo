@@ -1,20 +1,42 @@
 'use client';
-import { useState } from 'react';
-import { FileText, Dice5, Heart, ChevronDown } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import Select from 'react-select';
+import { FileText, Dice5, Heart } from 'lucide-react';
 import { Lead } from '@/types';
+
+// Large list of countries for the dropdown
+const COUNTRIES = [
+  'United States', 'Mexico', 'Brazil', 'South Korea', 'Russia', 'France', 
+  'China', 'India', 'Canada', 'United Kingdom', 'Japan', 'Germany', 
+  'Australia', 'Italy', 'Spain', 'Argentina', 'Other'
+].map(c => ({ value: c, label: c }));
 
 export default function LeadForm() {
   const [data, setData] = useState<Partial<Lead>>({ visas: [] });
   const [submitted, setSubmitted] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [noLinkedin, setNoLinkedin] = useState(false);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!data.firstName) newErrors.firstName = 'First name is required';
     if (!data.lastName) newErrors.lastName = 'Last name is required';
-    if (!data.email || !/^\S+@\S+\.\S+$/.test(data.email)) newErrors.email = 'Valid email is required';
+    
+    // Robust Email Regex
+    if (!data.email || !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$/.test(data.email)) {
+      newErrors.email = 'Valid email is required';
+    }
+    
     if (!data.citizenship) newErrors.citizenship = 'Country of Citizenship is required';
+    
+    // LinkedIn validation if "None" is NOT checked
+    if (!noLinkedin) {
+      if (!data.linkedin || !/^(https?:\/\/)?([\w]+\.)?linkedin\.com\/.*$|^(https?:\/\/)?([\w]+\.)?.*\.com.*$/.test(data.linkedin)) {
+        newErrors.linkedin = 'Valid LinkedIn or Personal Website URL is required';
+      }
+    }
+
     if (!data.visas || data.visas.length === 0) newErrors.visas = 'Please select at least one visa';
     if (!data.message || data.message.length < 10) newErrors.message = 'Please provide details on how we can help';
     if (!file) newErrors.file = 'Resume / CV is required';
@@ -27,7 +49,11 @@ export default function LeadForm() {
     e.preventDefault();
     if (!validate()) return;
     
-    const leadData = { ...data, resumeUrl: file ? file.name : '' };
+    const leadData = { 
+      ...data, 
+      linkedin: noLinkedin ? 'None Provided' : data.linkedin,
+      resumeUrl: file ? file.name : '' 
+    };
     
     await fetch('/api/leads', {
       method: 'POST',
@@ -39,7 +65,20 @@ export default function LeadForm() {
 
   const handleVisaChange = (visa: string) => {
     setData((prev) => {
-      const visas = prev.visas || [];
+      let visas = prev.visas || [];
+      
+      // If clicking "I don't know"
+      if (visa === "I don't know") {
+        if (visas.includes("I don't know")) {
+          return { ...prev, visas: [] }; // uncheck it
+        } else {
+          return { ...prev, visas: ["I don't know"] }; // check it, clear others
+        }
+      }
+
+      // If clicking anything else, remove "I don't know" first
+      visas = visas.filter(v => v !== "I don't know");
+
       if (visas.includes(visa)) {
         return { ...prev, visas: visas.filter((v) => v !== visa) };
       } else {
@@ -48,14 +87,27 @@ export default function LeadForm() {
     });
   };
 
+  const handleNoneClick = () => {
+    setNoLinkedin(!noLinkedin);
+    if (!noLinkedin) {
+      // Clear errors for linkedin when switching to "None"
+      setErrors((prev) => {
+        const newErrs = { ...prev };
+        delete newErrs.linkedin;
+        return newErrs;
+      });
+      setData(prev => ({ ...prev, linkedin: '' }));
+    }
+  };
+
   if (submitted) {
     return (
-      <div className="flex flex-col items-center justify-center space-y-6 pt-32 pb-20 max-w-[480px] mx-auto">
+      <div className="flex flex-col items-center justify-center space-y-6 py-20 px-8">
         <div className="flex flex-col items-center select-none">
           <FileText className="w-16 h-16 text-indigo-300 drop-shadow-sm" strokeWidth={1.5} />
         </div>
         <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Thank You</h2>
-        <p className="text-gray-900 text-center font-medium px-4 leading-relaxed max-w-[400px]">
+        <p className="text-gray-900 text-center font-medium leading-relaxed max-w-[400px]">
           Your information was submitted to our team of immigration attorneys. Expect an email from hello@tryalma.ai.
         </p>
         <div className="pt-4">
@@ -70,11 +122,11 @@ export default function LeadForm() {
   const inputClasses = "w-full border border-gray-300 rounded-xl p-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all";
 
   return (
-    <div className="max-w-[460px] mx-auto space-y-12 pb-16 pt-8">
+    <div className="mx-auto space-y-12 pb-16 pt-10 px-6 sm:px-12">
       <div className="text-center flex flex-col items-center space-y-4">
         <FileText className="w-12 h-12 text-indigo-300 mb-2 drop-shadow-sm" strokeWidth={1.5} />
         <h2 className="text-2xl font-bold pb-2 tracking-tight">Want to understand your visa options?</h2>
-        <p className="text-sm font-semibold text-gray-600 leading-relaxed px-2">
+        <p className="text-sm font-semibold text-gray-600 leading-relaxed max-w-sm">
           Submit the form below and our team of experienced attorneys will review your information and send a preliminary assessment of your case based on your goals.
         </p>
       </div>
@@ -93,28 +145,52 @@ export default function LeadForm() {
             <input type="email" placeholder="Email" value={data.email || ''} onChange={(e) => setData({ ...data, email: e.target.value })} className={inputClasses} />
             {errors.email && <p className="text-red-500 text-xs mt-1 px-1">{errors.email}</p>}
           </div>
+          
           <div className="relative">
-            <select 
-              value={data.citizenship || ''} 
-              onChange={(e) => setData({ ...data, citizenship: e.target.value })} 
-              className={`${inputClasses} appearance-none bg-transparent ${!data.citizenship ? 'text-gray-400' : 'text-gray-900'}`}
-            >
-              <option value="" disabled hidden>Country of Citizenship</option>
-              <option value="Mexico" className="text-gray-900">Mexico</option>
-              <option value="Brazil" className="text-gray-900">Brazil</option>
-              <option value="South Korea" className="text-gray-900">South Korea</option>
-              <option value="Russia" className="text-gray-900">Russia</option>
-              <option value="France" className="text-gray-900">France</option>
-              <option value="Other" className="text-gray-900">Other</option>
-            </select>
-            <ChevronDown className="absolute right-4 top-[18px] w-5 h-5 text-gray-400 pointer-events-none" />
+            <Select
+              options={COUNTRIES}
+              placeholder="Country of Citizenship"
+              className="react-select-container"
+              classNamePrefix="react-select"
+              value={data.citizenship ? { value: data.citizenship, label: data.citizenship } : null}
+              onChange={(option) => setData({ ...data, citizenship: option?.value || '' })}
+              styles={{
+                control: (base, state) => ({
+                  ...base,
+                  borderColor: state.isFocused ? 'black' : '#d1d5db',
+                  borderRadius: '0.75rem',
+                  padding: '5px',
+                  boxShadow: state.isFocused ? '0 0 0 2px black' : 'none',
+                  '&:hover': { borderColor: state.isFocused ? 'black' : '#d1d5db' },
+                }),
+                placeholder: (base) => ({ ...base, color: '#9ca3af', fontWeight: 400 }),
+                singleValue: (base) => ({ ...base, color: '#111827' })
+              }}
+            />
             {errors.citizenship && <p className="text-red-500 text-xs mt-1 px-1">{errors.citizenship}</p>}
           </div>
-          <div>
-            <input type="text" placeholder="LinkedIn / Personal Website URL" value={data.linkedin || ''} onChange={(e) => setData({ ...data, linkedin: e.target.value })} className={inputClasses} />
+          
+          <div className="relative border border-gray-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-black focus-within:border-transparent transition-all group flex items-center bg-white pr-4">
+            <input 
+              type="text" 
+              placeholder="LinkedIn / Personal Website URL" 
+              value={data.linkedin || ''} 
+              onChange={(e) => setData({ ...data, linkedin: e.target.value })} 
+              className={`w-full p-4 border-none focus:ring-0 focus:outline-none ${noLinkedin ? 'text-gray-400 bg-gray-50' : 'text-gray-900 bg-white'} placeholder:text-gray-400`} 
+              disabled={noLinkedin}
+            />
+            <button 
+              type="button"
+              onClick={handleNoneClick}
+              className={`text-xs font-semibold px-3 py-1.5 rounded-md transition-colors ml-2 shrink-0 ${noLinkedin ? 'bg-gray-800 text-white hover:bg-black' : 'text-gray-500 bg-gray-100 hover:bg-gray-200'}`}
+            >
+              None
+            </button>
           </div>
+          {errors.linkedin && <p className="text-red-500 text-xs mt-1 px-1">{errors.linkedin}</p>}
+
           <div>
-            <div className="relative border border-gray-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-black focus-within:border-transparent transition-all group">
+            <div className="relative border border-gray-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-black focus-within:border-transparent transition-all group mt-4">
               <input 
                 type="file" 
                 id="resumeUpload"
@@ -142,6 +218,13 @@ export default function LeadForm() {
           <div className="w-full flex flex-col space-y-3 pt-2">
             {['O-1', 'EB-1A', 'EB-2 NIW', "I don't know"].map((visa) => (
               <label key={visa} className="flex items-center space-x-3 cursor-pointer group">
+                {/* Hidden native checkbox for accessibility, but controlled logic via handleVisaChange */}
+                <input 
+                  type="checkbox" 
+                  className="hidden" 
+                  checked={data.visas?.includes(visa) || false} 
+                  onChange={() => handleVisaChange(visa)} 
+                />
                 <div className={`w-5 h-5 rounded flex items-center justify-center border transition-all ${data.visas?.includes(visa) ? 'bg-black border-black' : 'border-gray-300 group-hover:border-gray-400'}`}>
                   {data.visas?.includes(visa) && (
                     <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>

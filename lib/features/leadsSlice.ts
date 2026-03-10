@@ -32,10 +32,37 @@ const leadsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchLeads.pending, (state) => { state.status = 'loading'; })
+      .addCase(fetchLeads.pending, (state) => {
+        // only show loading on first fetch
+        if (state.data.length === 0) {
+          state.status = 'loading';
+        }
+      })
       .addCase(fetchLeads.fulfilled, (state, action) => {
+        const newLeads = action.payload;
+
+        // prevent unnecessary rerenders if nothing changed
+        const hasChanged =
+          state.data.length !== newLeads.length ||
+          newLeads.some((lead, i) => {
+            const existing = state.data[i];
+            if (!existing) return true;
+
+            return (
+              existing.id !== lead.id ||
+              existing.status !== lead.status ||
+              existing.firstName !== lead.firstName ||
+              existing.lastName !== lead.lastName ||
+              existing.citizenship !== lead.citizenship ||
+              existing.submittedAt !== lead.submittedAt
+            );
+          });
+
+        if (hasChanged) {
+          state.data = newLeads;
+        }
+
         state.status = 'succeeded';
-        state.data = action.payload;
       })
       .addCase(updateLeadStatus.fulfilled, (state, action) => {
         const index = state.data.findIndex(l => l.id === action.payload.id);

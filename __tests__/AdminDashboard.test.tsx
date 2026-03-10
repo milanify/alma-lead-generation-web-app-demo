@@ -40,8 +40,23 @@ describe('AdminDashboard', () => {
     jest.useRealTimers();
   });
 
+  const performLogin = async () => {
+    const usernameInput = screen.getByPlaceholderText('Username');
+    const passwordInput = screen.getByPlaceholderText('Password');
+    const signInBtn = screen.getByRole('button', { name: /Sign In/i });
+    
+    fireEvent.change(usernameInput, { target: { value: 'admin' } });
+    fireEvent.change(passwordInput, { target: { value: 'password' } });
+    fireEvent.click(signInBtn);
+    
+    await waitFor(() => {
+      expect(screen.queryByPlaceholderText('Username')).not.toBeInTheDocument();
+    });
+  };
+
   it('filters by status', async () => {
     renderWithProviders(<AdminDashboard />);
+    await performLogin();
     const statusBtn = screen.getByRole('button', { name: /Status/i });
     fireEvent.click(statusBtn);
 
@@ -58,6 +73,7 @@ describe('AdminDashboard', () => {
 
   it('searches globally', async () => {
     renderWithProviders(<AdminDashboard />);
+    await performLogin();
     const searchInput = screen.getByPlaceholderText('Search');
 
     // Search by Country instead of name
@@ -71,7 +87,7 @@ describe('AdminDashboard', () => {
 
   it('sorts by names ascending/descending', async () => {
     renderWithProviders(<AdminDashboard />);
-
+    await performLogin();
     const nameHeader = screen.getByText(/Name/i);
     // Initially sorted by submittedAt desc
     fireEvent.click(nameHeader); // Now sorted by Name ASC
@@ -94,6 +110,7 @@ describe('AdminDashboard', () => {
   it('handles pagination properly', async () => {
     // We have 6 elements. Default pagination is 5.
     renderWithProviders(<AdminDashboard />);
+    await performLogin();
 
     // Page 1
     // First element in `mockLeads` by default is sorted by submittedAt DESC, which is 'David Bowie'

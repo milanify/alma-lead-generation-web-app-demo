@@ -14,6 +14,9 @@ export default function AdminDashboard() {
   const dispatch = useDispatch<AppDispatch>();
   const { data: leads, status } = useSelector((state: RootState) => state.leads);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [usernameInput, setUsernameInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [authError, setAuthError] = useState('');
 
   // Filters & State
   const [searchTerm, setSearchTerm] = useState('');
@@ -30,24 +33,24 @@ export default function AdminDashboard() {
   const [isPaginationDropdownOpen, setIsPaginationDropdownOpen] = useState(false);
 
   useEffect(() => {
-    setIsAuthenticated(true);
-    if (status === 'idle') {
+    // Only fetch leads if authenticated
+    if (isAuthenticated && status === 'idle') {
       dispatch(fetchLeads());
     }
-  }, [dispatch, status]);
+  }, [isAuthenticated, dispatch, status]);
 
   // Polling hook for real-time automatic syncing
   useEffect(() => {
     const fetchIfVisible = () => {
-      if (document.visibilityState === "visible") {
+      if (isAuthenticated && document.visibilityState === "visible") {
         dispatch(fetchLeads());
       }
     };
 
-    const interval = setInterval(fetchIfVisible, 30000);
+    const interval = setInterval(fetchIfVisible, 20000);
 
     return () => clearInterval(interval);
-  }, [dispatch]);
+  }, [isAuthenticated, dispatch]);
 
   const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
@@ -119,8 +122,51 @@ export default function AdminDashboard() {
   }, [searchTerm, statusFilter, itemsPerPage]);
 
 
-  if (!isAuthenticated) return <div className="p-10 font-sans">Unauthorized</div>;
-  if (status === 'loading') return <div className="p-10 font-sans text-gray-500">Loading leads...</div>;
+  const handleAuthSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (usernameInput === 'admin' && passwordInput === 'password') {
+      setIsAuthenticated(true);
+      setAuthError('');
+    } else {
+      setAuthError('Invalid credentials.');
+    }
+  };
+
+  if (!isAuthenticated) return (
+    <div className="fixed inset-0 z-[100] bg-gray-50 flex items-center justify-center p-4">
+      <div className="bg-white p-10 rounded-3xl shadow-xl w-full max-w-[400px] space-y-8 border border-gray-100">
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-black tracking-tighter">almă</h1>
+          <p className="text-gray-500 font-medium">Internal Admin Portal</p>
+        </div>
+        <form onSubmit={handleAuthSubmit} className="space-y-5">
+          <div>
+            <input
+              type="text"
+              placeholder="Username"
+              className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-all font-medium text-gray-900 placeholder:text-gray-400"
+              value={usernameInput}
+              onChange={(e) => setUsernameInput(e.target.value)}
+            />
+          </div>
+          <div>
+            <input
+              type="password"
+              placeholder="Password"
+              className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-all font-medium text-gray-900 placeholder:text-gray-400"
+              value={passwordInput}
+              onChange={(e) => setPasswordInput(e.target.value)}
+            />
+          </div>
+          {authError && <p className="text-red-500 text-sm font-medium text-center">{authError}</p>}
+          <button type="submit" className="w-full py-4 bg-gray-900 text-white font-bold rounded-xl hover:bg-black transition-colors focus:ring-4 focus:ring-gray-200">
+            Sign In
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+  if (status === 'loading' && leads.length === 0) return <div className="p-10 font-sans text-gray-500 font-medium">Loading leads...</div>;
 
   const SortIcon = ({ column }: { column: SortColumn }) => {
     if (sortColumn !== column) return <MoveDown className="inline-block w-3.5 h-3.5 ml-1.5 text-gray-300" strokeWidth={2.5} />;
@@ -134,9 +180,9 @@ export default function AdminDashboard() {
       <h2 className="text-3xl font-bold tracking-tight text-gray-900">Leads</h2>
 
       {/* Controls */}
-      <div className="flex justify-between items-center mb-2">
-        <div className="flex space-x-4">
-          <div className="relative w-80">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0 text-[15px]">
+        <div className="flex space-x-4 ">
+          <div className="relative w-full sm:w-80">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" strokeWidth={2} />
             <input
               type="text"

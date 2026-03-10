@@ -10,7 +10,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <StoreProvider>
       <div className="flex h-screen bg-gray-50 overflow-hidden text-gray-900 font-sans">
         {/* Sidebar */}
-        <aside className="w-[280px] bg-white border-r border-gray-200 flex flex-col justify-between relative z-10">
+        <aside className="hidden md:flex w-[280px] shrink-0 bg-white border-r border-gray-200 flex-col justify-between relative z-10">
           {/* Subtle yellow gradient background layer for the top part */}
           <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-br from-[#FCFDDD] via-[#FCFECA]/30 to-white/0 pointer-events-none z-[-1]" />
 
@@ -34,7 +34,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto bg-white shadow-[-10px_0_20px_-10px_rgba(0,0,0,0.05)] relative z-20">
-          <div className="p-12 max-w-[1200px] mx-auto">
+          <div className="p-6 md:p-12 max-w-[1200px] mx-auto">
             {children}
           </div>
         </main>

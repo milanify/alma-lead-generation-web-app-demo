@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { leadsDB } from '@/lib/mockDb';
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const body = await request.json();
 
   const leadIndex = leadsDB.findIndex(l => l.id === id);

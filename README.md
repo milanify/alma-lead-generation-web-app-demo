@@ -12,6 +12,12 @@
 
 Run `npm run test` to execute the Jest unit tests.
 
+## Screenshots
+
+![Admin Page](./page-admin.png)
+![Home Page](./page-home.png)
+![Login Page](./page-login.png)
+
 ## System Design & Architecture (Development Time, About 4 hours)
 
 ### 1. Overview & Core Directives

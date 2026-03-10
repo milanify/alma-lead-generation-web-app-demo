@@ -1,36 +1,25 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Alma Leads Management System
 
-## Getting Started
+## System Design & Architecture
 
-First, run the development server:
+This application is built using **Next.js 14 (App Router)** to leverage Server-Side Rendering (SSR) and API routes within a single unified framework.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Key Architectural Choices:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **Frontend Framework (Next.js & React):** Provides a robust, SEO-friendly, and highly performant foundation. The App Router facilitates clean layout nesting (e.g., the Admin layout vs. Public layout).
+2. **State Management (Redux Toolkit):** Chosen for predictable state updates, especially useful in the Admin dashboard where lead statuses (`PENDING` -> `REACHED_OUT`) need to be reflected immediately across the UI without redundant API calls.
+3. **Form Rendering (JSONForms):** Implemented to satisfy the configuration-driven UI requirement. The schema defines the data structure and validation, while the UI schema defines the layout.
+4. **Styling (Tailwind CSS):** Used for rapid, utility-first styling to accurately match the provided Figma/Mockup screens while ensuring mobile responsiveness.
+5. **Mocked Backend (Next.js API Routes):** We use Next.js Route Handlers (`/api/leads`, `/api/auth`) with an in-memory array to simulate a database. File uploads are mocked by converting files to Base64 strings.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### How to Run Locally
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Clone the repository.
+2. Run `npm install`.
+3. Run `npm run dev`.
+4. Navigate to `http://localhost:3000` for the Public Form.
+5. Navigate to `http://localhost:3000/admin` for the Internal Dashboard. (Mock Auth: Any username, password: `password`).
 
-## Learn More
+### Testing
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Run `npm run test` to execute the Jest unit tests.

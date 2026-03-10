@@ -26,6 +26,13 @@ To meet the requirements without a real database, I utilized Next.js **Route Han
 ### 4. Admin Authentication
 **Decision:** For the scope of this assignment, I implemented a simple mock authentication guard in the `AdminDashboard`. In a production scenario, this would be replaced by a robust solution like NextAuth.js or Clerk with session cookies.
 
-### 5. UI/UX Considerations
-- **Component Styling:** Special attention was given to match the colors, typography weight, shadow elevation, and interactive hover states (e.g., table row hover, button transitions) specified in the mockup. 
-- **Accessibility/UX:** Visual feedback is provided when fields are missed (error messages), and focus states are clearly delineated using Tailwind `focus:ring` utilities.
+### 5. UI/UX Considerations & Polish
+- **Component Styling**: Special attention was given to match the colors, typography weight, shadow elevation, and interactive hover states (e.g., table row hover, button transitions) specified in the mockup. 
+- **Accessibility/UX**: Visual feedback is provided when fields are missed (error messages), and focus states are clearly delineated using Tailwind `focus:ring` utilities.
+- **Micro-Interactions**: The Admin Dashboard features intelligent micro-interactions, such as the Status toggle button seamlessly animating on hover (flipping the refresh icon), indicating interactivity intuitively.
+- **Dynamic Table Engine**: The `AdminDashboard` is powered by a robust client-side `useMemo` calculation matrix. It performs cascading sorts, filters, and paginations instantly and seamlessly without requiring a network round-trip.
+- **Native Form Integration**: To ensure maximum cross-browser compatibility and familiar user experiences, the form's "Name" inputs utilize native HTML5 validation (via the `pattern` attribute and `setCustomValidity`) to strictly restrict data to letters only without needing a heavy third-party library.
+- **Intelligent Feedback**: The "How can we help" text area provides dynamic, mathematically calculated context on how many characters are remaining if the user tries to submit a request that is too brief, lowering friction compared to a static error.
+
+### 6. Development Persistence
+- **Mock DB Hot-Reloading**: Since Next.js App Router eagerly clears module cache during development hot-reloads, adding leads through the browser forms and subsequently `PATCHing` their status originally resulted in 404s. I implemented a standard Next.js backend pattern (`globalThis` singleton instantiation) across `lib/mockDb.ts` to ensure memory states endure hot-reloading reliably.

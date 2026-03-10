@@ -32,7 +32,7 @@ describe('LeadForm Component', () => {
       expect(screen.getByText('First name is required')).toBeInTheDocument();
       expect(screen.getByText('Last name is required')).toBeInTheDocument();
       expect(screen.getByText('Country of Citizenship is required')).toBeInTheDocument();
-      expect(screen.getByText('Valid LinkedIn / Personal Website URL. Or click None.')).toBeInTheDocument();
+      expect(screen.getByText('Valid LinkedIn / Personal Website URL is required. Or click None.')).toBeInTheDocument();
       expect(screen.getByText('Please select at least one visa')).toBeInTheDocument();
       expect(screen.getByText('Resume / CV is required')).toBeInTheDocument();
     });
@@ -42,7 +42,7 @@ describe('LeadForm Component', () => {
     render(<LeadForm />);
     const firstNameInput = screen.getByPlaceholderText('First Name');
     fireEvent.change(firstNameInput, { target: { value: 'Milan123' } });
-    
+
     // In JSDOM, setCustomValidity sets the validationMessage property.
     expect((firstNameInput as HTMLInputElement).validationMessage).toBe('Please include letters only.');
   });
@@ -51,7 +51,7 @@ describe('LeadForm Component', () => {
     render(<LeadForm />);
     const linkedInInput = screen.getByPlaceholderText('LinkedIn / Personal Website URL');
     const noneBtn = screen.getByRole('button', { name: 'None' });
-    
+
     expect(linkedInInput).not.toBeDisabled();
     fireEvent.click(noneBtn);
     expect(linkedInInput).toBeDisabled();

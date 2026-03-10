@@ -18,7 +18,7 @@ This application is built using **Next.js 14 (App Router)** to leverage Server-S
 2. Run `npm install`.
 3. Run `npm run dev`.
 4. Navigate to `http://localhost:3000` for the Public Form.
-5. Navigate to `http://localhost:3000/admin` for the Internal Dashboard. (Mock Auth: Any username, password: `password`).
+5. Navigate to `http://localhost:3000/admin` for the Internal Dashboard. (login credentials are: `admin` and `password`).
 
 ### Testing
 

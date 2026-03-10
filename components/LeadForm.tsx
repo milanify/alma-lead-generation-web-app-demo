@@ -33,12 +33,24 @@ export default function LeadForm() {
     // LinkedIn validation if "None" is NOT checked
     if (!noLinkedin) {
       if (!data.linkedin || !/^(https?:\/\/)?([\w]+\.)?linkedin\.com\/.*$|^(https?:\/\/)?([\w]+\.)?.*\.com.*$/.test(data.linkedin)) {
-        newErrors.linkedin = 'Valid LinkedIn or Personal Website URL is required';
+        newErrors.linkedin = 'Valid LinkedIn / Personal Website URL. Or click None.';
       }
     }
 
-    if (!data.visas || data.visas.length === 0) newErrors.visas = 'Please select at least one visa';
-    if (!data.message || data.message.length < 10) newErrors.message = 'Please provide details on how we can help';
+    if (!data.visas || data.visas.length === 0) {
+      newErrors.visas = 'Please select at least one visa';
+    } else if (data.visas.includes("I don't know")) {
+      // Valid submission, no error
+    }
+
+    if (!data.message || data.message.length < 10) {
+      if (data.message && data.message.length > 0) {
+        newErrors.message = `Please enter ${10 - data.message.length} more characters for submission. You have entered ${data.message.length} so far. Please provide more details.`;
+      } else {
+        newErrors.message = 'Please provide details on how we can help';
+      }
+    }
+    
     if (!file) newErrors.file = 'Resume / CV is required';
     
     setErrors(newErrors);
@@ -134,12 +146,36 @@ export default function LeadForm() {
       <form onSubmit={handleSubmit} className="space-y-10">
         <div className="space-y-4">
           <div>
-            <input type="text" placeholder="First Name" value={data.firstName || ''} onChange={(e) => setData({ ...data, firstName: e.target.value })} className={inputClasses} />
-            {errors.firstName && <p className="text-red-500 text-xs mt-1 px-1">{errors.firstName}</p>}
+            <input 
+              type="text" 
+              placeholder="First Name" 
+              value={data.firstName || ''} 
+              onChange={(e) => {
+                e.target.setCustomValidity("");
+                setData({ ...data, firstName: e.target.value });
+              }} 
+              onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Please include letters only.")}
+              pattern="[A-Za-z\s\-]+"
+              className={inputClasses} 
+              required
+            />
+            {errors.firstName && !data.firstName && <p className="text-red-500 text-xs mt-1 px-1">{errors.firstName}</p>}
           </div>
           <div>
-            <input type="text" placeholder="Last Name" value={data.lastName || ''} onChange={(e) => setData({ ...data, lastName: e.target.value })} className={inputClasses} />
-            {errors.lastName && <p className="text-red-500 text-xs mt-1 px-1">{errors.lastName}</p>}
+            <input 
+              type="text" 
+              placeholder="Last Name" 
+              value={data.lastName || ''} 
+              onChange={(e) => {
+                e.target.setCustomValidity("");
+                setData({ ...data, lastName: e.target.value });
+              }} 
+              onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Please include letters only.")}
+              pattern="[A-Za-z\s\-]+"
+              className={inputClasses} 
+              required
+            />
+            {errors.lastName && !data.lastName && <p className="text-red-500 text-xs mt-1 px-1">{errors.lastName}</p>}
           </div>
           <div>
             <input type="email" placeholder="Email" value={data.email || ''} onChange={(e) => setData({ ...data, email: e.target.value })} className={inputClasses} />

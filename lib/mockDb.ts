@@ -1,4 +1,4 @@
-import { Lead } from '../types';
+import { Lead } from '@/types';
 
 // Pre-populate with mock data from the screenshot
 export const leadsDB: Lead[] = [

@@ -33,7 +33,7 @@ export default function LeadForm() {
     // LinkedIn validation if "None" is NOT checked
     if (!noLinkedin) {
       if (!data.linkedin || !/^(https?:\/\/)?([\w]+\.)?linkedin\.com\/.*$|^(https?:\/\/)?([\w]+\.)?.*\.com.*$/.test(data.linkedin)) {
-        newErrors.linkedin = 'Valid LinkedIn / Personal Website URL. Or click None.';
+        newErrors.linkedin = 'Valid LinkedIn / Personal Website URL is required. Or click None.';
       }
     }
 

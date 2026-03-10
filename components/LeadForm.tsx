@@ -6,8 +6,8 @@ import { Lead } from '@/types';
 
 // Large list of countries for the dropdown
 const COUNTRIES = [
-  'United States', 'Mexico', 'Brazil', 'South Korea', 'Russia', 'France', 
-  'China', 'India', 'Canada', 'United Kingdom', 'Japan', 'Germany', 
+  'United States', 'Mexico', 'Brazil', 'South Korea', 'Russia', 'France',
+  'China', 'India', 'Canada', 'United Kingdom', 'Japan', 'Germany',
   'Australia', 'Italy', 'Spain', 'Argentina', 'Other'
 ].map(c => ({ value: c, label: c }));
 
@@ -22,14 +22,14 @@ export default function LeadForm() {
     const newErrors: Record<string, string> = {};
     if (!data.firstName) newErrors.firstName = 'First name is required';
     if (!data.lastName) newErrors.lastName = 'Last name is required';
-    
+
     // Robust Email Regex
     if (!data.email || !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$/.test(data.email)) {
       newErrors.email = 'Valid email is required';
     }
-    
+
     if (!data.citizenship) newErrors.citizenship = 'Country of Citizenship is required';
-    
+
     // LinkedIn validation if "None" is NOT checked
     if (!noLinkedin) {
       if (!data.linkedin || !/^(https?:\/\/)?([\w]+\.)?linkedin\.com\/.*$|^(https?:\/\/)?([\w]+\.)?.*\.com.*$/.test(data.linkedin)) {
@@ -45,14 +45,14 @@ export default function LeadForm() {
 
     if (!data.message || data.message.length < 10) {
       if (data.message && data.message.length > 0) {
-        newErrors.message = `Please enter ${10 - data.message.length} more characters for submission. You have entered ${data.message.length} so far. Please provide more details.`;
+        newErrors.message = `Please enter ${10 - data.message.length} more characters for submission. You have entered ${data.message.length} so far.`;
       } else {
         newErrors.message = 'Please provide details on how we can help';
       }
     }
-    
+
     if (!file) newErrors.file = 'Resume / CV is required';
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -60,13 +60,13 @@ export default function LeadForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    
-    const leadData = { 
-      ...data, 
+
+    const leadData = {
+      ...data,
       linkedin: noLinkedin ? 'None Provided' : data.linkedin,
-      resumeUrl: file ? file.name : '' 
+      resumeUrl: file ? file.name : ''
     };
-    
+
     await fetch('/api/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -78,7 +78,7 @@ export default function LeadForm() {
   const handleVisaChange = (visa: string) => {
     setData((prev) => {
       let visas = prev.visas || [];
-      
+
       // If clicking "I don't know"
       if (visa === "I don't know") {
         if (visas.includes("I don't know")) {
@@ -146,33 +146,33 @@ export default function LeadForm() {
       <form onSubmit={handleSubmit} className="space-y-10">
         <div className="space-y-4">
           <div>
-            <input 
-              type="text" 
-              placeholder="First Name" 
-              value={data.firstName || ''} 
+            <input
+              type="text"
+              placeholder="First Name"
+              value={data.firstName || ''}
               onChange={(e) => {
                 e.target.setCustomValidity("");
                 setData({ ...data, firstName: e.target.value });
-              }} 
+              }}
               onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Please include letters only.")}
               pattern="[A-Za-z\s\-]+"
-              className={inputClasses} 
+              className={inputClasses}
               required
             />
             {errors.firstName && !data.firstName && <p className="text-red-500 text-xs mt-1 px-1">{errors.firstName}</p>}
           </div>
           <div>
-            <input 
-              type="text" 
-              placeholder="Last Name" 
-              value={data.lastName || ''} 
+            <input
+              type="text"
+              placeholder="Last Name"
+              value={data.lastName || ''}
               onChange={(e) => {
                 e.target.setCustomValidity("");
                 setData({ ...data, lastName: e.target.value });
-              }} 
+              }}
               onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Please include letters only.")}
               pattern="[A-Za-z\s\-]+"
-              className={inputClasses} 
+              className={inputClasses}
               required
             />
             {errors.lastName && !data.lastName && <p className="text-red-500 text-xs mt-1 px-1">{errors.lastName}</p>}
@@ -181,7 +181,7 @@ export default function LeadForm() {
             <input type="email" placeholder="Email" value={data.email || ''} onChange={(e) => setData({ ...data, email: e.target.value })} className={inputClasses} />
             {errors.email && <p className="text-red-500 text-xs mt-1 px-1">{errors.email}</p>}
           </div>
-          
+
           <div className="relative">
             <Select
               options={COUNTRIES}
@@ -205,17 +205,17 @@ export default function LeadForm() {
             />
             {errors.citizenship && <p className="text-red-500 text-xs mt-1 px-1">{errors.citizenship}</p>}
           </div>
-          
+
           <div className="relative border border-gray-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-black focus-within:border-transparent transition-all group flex items-center bg-white pr-4">
-            <input 
-              type="text" 
-              placeholder="LinkedIn / Personal Website URL" 
-              value={data.linkedin || ''} 
-              onChange={(e) => setData({ ...data, linkedin: e.target.value })} 
-              className={`w-full p-4 border-none focus:ring-0 focus:outline-none ${noLinkedin ? 'text-gray-400 bg-gray-50' : 'text-gray-900 bg-white'} placeholder:text-gray-400`} 
+            <input
+              type="text"
+              placeholder="LinkedIn / Personal Website URL"
+              value={data.linkedin || ''}
+              onChange={(e) => setData({ ...data, linkedin: e.target.value })}
+              className={`w-full p-4 border-none focus:ring-0 focus:outline-none ${noLinkedin ? 'text-gray-400 bg-gray-50' : 'text-gray-900 bg-white'} placeholder:text-gray-400`}
               disabled={noLinkedin}
             />
-            <button 
+            <button
               type="button"
               onClick={handleNoneClick}
               className={`text-xs font-semibold px-3 py-1.5 rounded-md transition-colors ml-2 shrink-0 ${noLinkedin ? 'bg-gray-800 text-white hover:bg-black' : 'text-gray-500 bg-gray-100 hover:bg-gray-200'}`}
@@ -227,8 +227,8 @@ export default function LeadForm() {
 
           <div>
             <div className="relative border border-gray-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-black focus-within:border-transparent transition-all group mt-4">
-              <input 
-                type="file" 
+              <input
+                type="file"
                 id="resumeUpload"
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
@@ -255,11 +255,11 @@ export default function LeadForm() {
             {['O-1', 'EB-1A', 'EB-2 NIW', "I don't know"].map((visa) => (
               <label key={visa} className="flex items-center space-x-3 cursor-pointer group">
                 {/* Hidden native checkbox for accessibility, but controlled logic via handleVisaChange */}
-                <input 
-                  type="checkbox" 
-                  className="hidden" 
-                  checked={data.visas?.includes(visa) || false} 
-                  onChange={() => handleVisaChange(visa)} 
+                <input
+                  type="checkbox"
+                  className="hidden"
+                  checked={data.visas?.includes(visa) || false}
+                  onChange={() => handleVisaChange(visa)}
                 />
                 <div className={`w-5 h-5 rounded flex items-center justify-center border transition-all ${data.visas?.includes(visa) ? 'bg-black border-black' : 'border-gray-300 group-hover:border-gray-400'}`}>
                   {data.visas?.includes(visa) && (
@@ -278,12 +278,12 @@ export default function LeadForm() {
           <Heart className="w-12 h-12 text-indigo-300 mb-0 drop-shadow-sm" strokeWidth={1.5} />
           <h3 className="font-bold text-xl tracking-tight">How can we help you?</h3>
           <div className="w-full pt-2">
-            <textarea 
+            <textarea
               rows={4}
-              placeholder="What is your current status and when does it expire? What is your past immigration history? Are you looking for long-term permanent residency or short-term employment visa or both? Are there any timeline considerations?" 
-              value={data.message || ''} 
-              onChange={(e) => setData({ ...data, message: e.target.value })} 
-              className={`${inputClasses} resize-none text-sm placeholder:text-gray-400 leading-relaxed`} 
+              placeholder="What is your current status and when does it expire? What is your past immigration history? Are you looking for long-term permanent residency or short-term employment visa or both? Are there any timeline considerations?"
+              value={data.message || ''}
+              onChange={(e) => setData({ ...data, message: e.target.value })}
+              className={`${inputClasses} resize-none text-sm placeholder:text-gray-400 leading-relaxed`}
             />
             {errors.message && <p className="text-red-500 text-xs mt-1 px-1">{errors.message}</p>}
           </div>

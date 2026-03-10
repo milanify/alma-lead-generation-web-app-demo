@@ -48,6 +48,7 @@ export default function AdminDashboard() {
 
     return () => clearInterval(interval);
   }, [dispatch]);
+
   const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
       setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');

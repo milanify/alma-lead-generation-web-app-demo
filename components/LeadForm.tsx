@@ -151,13 +151,14 @@ export default function LeadForm() {
               placeholder="First Name"
               value={data.firstName || ''}
               onChange={(e) => {
-                e.target.setCustomValidity("");
+                if (/[^A-Za-z\s\-]/.test(e.target.value)) {
+                  e.target.setCustomValidity("Please include letters only.");
+                } else {
+                  e.target.setCustomValidity("");
+                }
                 setData({ ...data, firstName: e.target.value });
               }}
-              onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Please include letters only.")}
-              pattern="[A-Za-z\s\-]+"
               className={inputClasses}
-              required
             />
             {errors.firstName && !data.firstName && <p className="text-red-500 text-xs mt-1 px-1">{errors.firstName}</p>}
           </div>
@@ -167,13 +168,14 @@ export default function LeadForm() {
               placeholder="Last Name"
               value={data.lastName || ''}
               onChange={(e) => {
-                e.target.setCustomValidity("");
+                if (/[^A-Za-z\s\-]/.test(e.target.value)) {
+                  e.target.setCustomValidity("Please include letters only.");
+                } else {
+                  e.target.setCustomValidity("");
+                }
                 setData({ ...data, lastName: e.target.value });
               }}
-              onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Please include letters only.")}
-              pattern="[A-Za-z\s\-]+"
               className={inputClasses}
-              required
             />
             {errors.lastName && !data.lastName && <p className="text-red-500 text-xs mt-1 px-1">{errors.lastName}</p>}
           </div>
@@ -182,12 +184,14 @@ export default function LeadForm() {
             {errors.email && <p className="text-red-500 text-xs mt-1 px-1">{errors.email}</p>}
           </div>
 
-          <div className="relative">
+          <div className="relative z-50">
             <Select
               options={COUNTRIES}
               placeholder="Country of Citizenship"
               className="react-select-container"
               classNamePrefix="react-select"
+              menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+              menuPosition="fixed"
               value={data.citizenship ? { value: data.citizenship, label: data.citizenship } : null}
               onChange={(option) => setData({ ...data, citizenship: option?.value || '' })}
               styles={{
@@ -200,7 +204,8 @@ export default function LeadForm() {
                   '&:hover': { borderColor: state.isFocused ? 'black' : '#d1d5db' },
                 }),
                 placeholder: (base) => ({ ...base, color: '#9ca3af', fontWeight: 400 }),
-                singleValue: (base) => ({ ...base, color: '#111827' })
+                singleValue: (base) => ({ ...base, color: '#111827' }),
+                menuPortal: base => ({ ...base, zIndex: 9999 })
               }}
             />
             {errors.citizenship && <p className="text-red-500 text-xs mt-1 px-1">{errors.citizenship}</p>}

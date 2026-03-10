@@ -1,4 +1,9 @@
+import { Metadata } from 'next';
 import StoreProvider from '../StoreProvider';
+
+export const metadata: Metadata = {
+  title: "Leads | Admin",
+};
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (

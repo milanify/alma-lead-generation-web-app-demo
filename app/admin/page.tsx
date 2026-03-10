@@ -36,6 +36,14 @@ export default function AdminDashboard() {
     }
   }, [dispatch, status]);
 
+  // Polling hook for real-time automatic syncing
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      dispatch(fetchLeads());
+    }, 5000);
+    return () => clearInterval(intervalId);
+  }, [dispatch]);
+
   const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
       setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');

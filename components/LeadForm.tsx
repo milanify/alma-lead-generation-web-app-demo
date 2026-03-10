@@ -236,7 +236,7 @@ export default function LeadForm() {
               />
               <div className="flex items-center justify-between p-4 bg-white">
                 <span className={`truncate text-sm ${file ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
-                  {file ? file.name : 'Resume / CV'}
+                  {file ? file.name : 'Resume / CV (.pdf only)'}
                 </span>
                 <span className="text-gray-500 bg-gray-100 group-hover:bg-gray-200 px-3 py-1 rounded-md text-xs font-semibold transition-colors">
                   Browse

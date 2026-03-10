@@ -186,6 +186,7 @@ export default function LeadForm() {
 
           <div className="relative z-50">
             <Select
+              instanceId="citizenship-select"
               options={COUNTRIES}
               placeholder="Country of Citizenship"
               className="react-select-container"

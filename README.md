@@ -1,5 +1,17 @@
 # Alma Leads Management System
 
+### How to Run Locally
+
+1. Clone the repository.
+2. Run `npm install`.
+3. Run `npm run dev`.
+4. Navigate to `http://localhost:3000` for the Public Form.
+5. Navigate to `http://localhost:3000/admin` for the Internal Dashboard. (login credentials are: `admin` and `password`).
+
+### Testing
+
+Run `npm run test` to execute the Jest unit tests.
+
 ## System Design & Architecture
 
 This application is built using **Next.js 14 (App Router)** to leverage Server-Side Rendering (SSR) and API routes within a single unified framework.
@@ -12,14 +24,3 @@ This application is built using **Next.js 14 (App Router)** to leverage Server-S
 4. **Styling (Tailwind CSS):** Used for rapid, utility-first styling to accurately match the provided Figma/Mockup screens while ensuring mobile responsiveness.
 5. **Mocked Backend (Next.js API Routes):** We use Next.js Route Handlers (`/api/leads`, `/api/auth`) with an in-memory array to simulate a database. File uploads are mocked by converting files to Base64 strings.
 
-### How to Run Locally
-
-1. Clone the repository.
-2. Run `npm install`.
-3. Run `npm run dev`.
-4. Navigate to `http://localhost:3000` for the Public Form.
-5. Navigate to `http://localhost:3000/admin` for the Internal Dashboard. (login credentials are: `admin` and `password`).
-
-### Testing
-
-Run `npm run test` to execute the Jest unit tests.

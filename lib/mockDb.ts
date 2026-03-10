@@ -1,7 +1,5 @@
 import { Lead } from '@/types';
 
-import { Lead } from '@/types';
-
 // Pre-populate with mock data
 const initialLeads: Lead[] = [
   {
